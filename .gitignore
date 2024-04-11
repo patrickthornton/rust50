@@ -1,0 +1,29 @@
+# vim
+*.swp
+
+# python
+*.py[cod]
+__pycache__
+
+# rust
+debug/
+target/
+**/*.rs.bk
+*.pdb
+
+# svelte
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+*.lockb
+
+# mac
+.DS_Store
+Desktop.ini
+
