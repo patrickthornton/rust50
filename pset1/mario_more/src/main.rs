@@ -8,7 +8,7 @@ fn main() {
     let mut output = io::stdout();
     let height =
         get_height(&mut input, &mut output).expect("stdin/stdout should work while getting height");
-    pyramid(&mut output, height).expect("stdin/stdout should work while printing pyramid");
+    pyramid(&mut output, height).expect("stdout should work while printing pyramid");
 }
 
 fn get_height(input: &mut impl BufRead, output: &mut impl Write) -> io::Result<u128> {
@@ -72,7 +72,7 @@ mod tests {
     fn test_pyramid_1() {
         let height = 1;
         let mut output: Vec<u8> = Vec::new();
-        pyramid(&mut output, height).expect("stdib/stdout should work while printing pyramid");
+        pyramid(&mut output, height).expect("stdin/stdout should work while printing pyramid");
 
         let expected = b"# #\n";
         assert_eq!(output, expected);
@@ -82,7 +82,7 @@ mod tests {
     fn test_pyramid_2() {
         let height = 6;
         let mut output: Vec<u8> = Vec::new();
-        pyramid(&mut output, height).expect("stdib/stdout should work while printing pyramid");
+        pyramid(&mut output, height).expect("stdout should work while printing pyramid");
 
         let expected =
             b"     # #\n    ## ##\n   ### ###\n  #### ####\n ##### #####\n###### ######\n";
