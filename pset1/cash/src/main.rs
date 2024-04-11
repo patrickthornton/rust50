@@ -22,12 +22,12 @@ fn get_cents(input: &mut impl BufRead, output: &mut impl Write) -> io::Result<u1
         // prompt
         output.write_all(b"Change owed: ")?;
         output.flush()?;
-        let mut height_input = String::new();
-        input.read_line(&mut height_input)?;
+        let mut cents_input = String::new();
+        input.read_line(&mut cents_input)?;
 
-        // verify that height_input is a valid nonnegative integer
-        cents = match height_input.trim().parse() {
-            Ok(height) => height,
+        // verify that cents_input is a valid nonnegative integer
+        cents = match cents_input.trim().parse() {
+            Ok(cents) => cents,
             Err(_) => continue,
         };
 
