@@ -9,7 +9,7 @@ fn main() {
 
 fn converse(input: &mut impl BufRead, output: &mut impl Write) -> io::Result<usize> {
     // prompt
-    output.write(b"What's your name? ")?;
+    output.write_all(b"What's your name? ")?;
     output.flush()?;
     let mut name = String::new();
     input.read_line(&mut name)?;
