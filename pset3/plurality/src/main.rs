@@ -88,7 +88,10 @@ mod tests {
                 election.entry(candidate.to_string()).or_insert(*votes);
             }
             let mut winners = plurality(election);
-            assert_eq!(winners.sort(), expected.sort());
+            let mut expected: Vec<String> = expected.iter().map(|s| s.to_string()).collect();
+            winners.sort();
+            expected.sort();
+            assert_eq!(winners, expected);
         }
     }
 }
