@@ -7,9 +7,9 @@ const POINTS: [u32; 26] = [
 
 fn main() {
     let p1 = rust50::get_string("Player 1: ")
-        .expect("cs50 module should work for getting player 1's word");
+        .expect("rust50 module should work for getting player 1's word");
     let p2 = rust50::get_string("Player 2: ")
-        .expect("cs50 module should work for getting player 2's word");
+        .expect("rust50 module should work for getting player 2's word");
 
     let result = scrabble(p1, p2);
 
