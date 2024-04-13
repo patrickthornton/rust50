@@ -24,10 +24,9 @@ mod election {
         // simulates a tideman election; presumes there will be no more than one sink
         pub fn tideman(&self) -> Option<String> {
             let graph = self.construct_graph()?;
-            match graph.source() {
-                Some(Vertex(index)) => Some(self.candidates[*index].to_owned()),
-                None => None,
-            }
+            graph
+                .source()
+                .map(|Vertex(index)| self.candidates[*index].to_owned())
         }
 
         // in election terms: construct a graph where each candidate is a vertex
@@ -48,7 +47,7 @@ mod election {
 
         // in election terms: get the list of candidates
         fn get_vertices(&self) -> Vec<Vertex<usize>> {
-            (0..self.candidates.len()).map(|i| Vertex(i)).collect()
+            (0..self.candidates.len()).map(Vertex).collect()
         }
 
         // in election terms: get the list of head-to-head matchups

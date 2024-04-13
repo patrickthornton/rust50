@@ -60,11 +60,8 @@ where
 
     // returns the source of the graph if it exists
     pub fn source(&self) -> Option<&Vertex<T>> {
-        for v in &self.v {
-            if self.e.iter().all(|Edge(_, v2, _)| *v != *v2) {
-                return Some(v);
-            }
-        }
-        None
+        self.v
+            .iter()
+            .find(|&v| self.e.iter().all(|Edge(_, v2, _)| *v != *v2))
     }
 }
