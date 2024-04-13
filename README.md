@@ -1,4 +1,4 @@
-WIP: completed up to pset2, but no farther yet!
+WIP: completed up to pset3, but no farther yet!
 
 what it says on the tin; an implementation of about half of cs50's problem sets in rust.
 
