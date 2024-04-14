@@ -1,11 +1,15 @@
 use std::collections::HashSet;
-use std::io::{BufRead, BufReader, Read, Result, Write};
+use std::io::{BufReader, Read, Result, Write};
 use std::{env, fs::File, io};
 
 const MAX_LENGTH: usize = 45;
 
-struct Dictionary {
-    words: HashSet<String>,
+const PROBABLE_MAX_TEXT_SIZE: usize = 1024 * 1024 * 10;
+const PROBABLE_MAX_DICTIONARY_SIZE: usize = 1024 * 1024 * 2;
+
+struct Dictionary<'a> {
+    dict_buffer: [u8; PROBABLE_MAX_DICTIONARY_SIZE],
+    words: HashSet<&'a [u8]>,
 }
 
 struct Spellcheck {
@@ -13,9 +17,10 @@ struct Spellcheck {
     misspellings: usize,
 }
 
-impl Dictionary {
+impl<'a> Dictionary<'a> {
     fn new() -> Self {
         Dictionary {
+            dict_buffer: [0; PROBABLE_MAX_DICTIONARY_SIZE],
             words: HashSet::new(),
         }
     }
@@ -23,17 +28,21 @@ impl Dictionary {
     // loads dictionary into a hashset; returns the number of words in dictionary
     fn load(&mut self, dictionary: &mut impl Read) -> Result<usize> {
         let mut reader = BufReader::new(dictionary);
-        let buffer = &mut String::new();
-        while reader.read_line(buffer)? != 0 {
-            self.words
-                .insert(buffer.trim().to_string().to_ascii_lowercase());
-            buffer.clear();
+
+        reader.read(&mut self.dict_buffer);
+        let words: Vec<&[u8]> = self.dict_buffer.split(|&c| c == b'\n').collect();
+        for word in words {
+            self.words.insert(word);
         }
         Ok(self.words.len())
     }
 
-    fn check(&self, word: &str) -> bool {
-        self.words.contains(word.to_ascii_lowercase().as_str())
+    fn check(&self, word: &[u8]) -> bool {
+        let mut word = word.to_owned();
+        for c in word {
+            c.make_ascii_lowercase();
+        }
+        self.words.contains(word)
     }
 
     // attempting to comply with cs50's implementation exactly;
@@ -46,58 +55,58 @@ impl Dictionary {
     fn spellcheck(&self, text: &mut impl Read, output: &mut impl Write) -> Result<Spellcheck> {
         let mut word_count = 0;
         let mut misspellings_count = 0;
-        let reader = BufReader::new(text);
-        for line in reader.lines() {
-            let line = match line {
-                Ok(line) => line,
-                Err(_) => {
-                    continue;
-                }
-            };
-            let mut words: Vec<&str> = line
-                .split(|c: char| !c.is_alphanumeric() && c != '\'')
-                .collect();
-            while let Some(word) = words.pop() {
-                // if there's a number or it's too long, check for potential restarts;
-                // i.e., "check50's" should pop "'s" back onto words
-                if word.chars().any(|c| c.is_numeric()) || word.len() > MAX_LENGTH {
-                    if let Some(index) = word.find(|c: char| !c.is_ascii_alphanumeric()) {
-                        words.push(&word[index + 1..]);
-                    }
-                }
-                // otherwise it's a valid word
-                else {
-                    // shave off all non-alphabetic characters except apostrophes
-                    let word: String = word
-                        .chars()
-                        .filter(|c| c.is_alphabetic() || *c == '\'')
-                        .collect();
-                    if word.len() == 0 {
-                        continue;
-                    }
+        let mut reader = BufReader::new(text);
 
-                    // shave off initial apostrophe
-                    let mut word = word.as_str();
-                    if word
-                        .chars()
-                        .next()
-                        .expect("str should have at least one char")
-                        == '\''
-                    {
-                        word = &word[1..];
-                    }
-                    if word.len() == 0 {
-                        continue;
-                    }
-
-                    word_count += 1;
-
-                    // check for a misspelling
-                    if !self.check(word) {
-                        misspellings_count += 1;
-                        writeln!(output, "{}", word).expect("bad output");
-                    }
+        // new idea; just read the whole file into a byte array
+        let mut text = [0; PROBABLE_MAX_TEXT_SIZE];
+        reader.read(&mut text)?;
+        let mut words: Vec<&[u8]> = text
+            .split(|&c| !(c as char).is_alphanumeric() && c != b'\'')
+            .collect();
+        while let Some(mut word) = words.pop() {
+            // if there's a number or it's too long, check for potential restarts;
+            // i.e., "check50's" should pop "'s" back onto words
+            if word.iter().any(|&c| (c as char).is_numeric()) || word.len() > MAX_LENGTH {
+                if let Some(index) = word
+                    .iter()
+                    .position(|&c| !(c as char).is_ascii_alphanumeric())
+                {
+                    words.push(&word[index + 1..]);
                 }
+                continue;
+            }
+            // otherwise it's a valid word
+
+            // shave off all non-alphabetic characters except apostrophes
+            // word = word
+            //     .iter()
+            //     .filter(|&&c| (c as char).is_alphabetic() || c as char == '\'')
+            //     .collect();
+            // if word.len() == 0 {
+            //     continue;
+            // }
+
+            // shave off initial apostrophe
+            if word
+                .iter()
+                .next()
+                .expect("str should have at least one char")
+                .to_owned()
+                == b'\''
+            {
+                word = &word[1..];
+            }
+            if word.len() == 0 {
+                continue;
+            }
+
+            word_count += 1;
+
+            // check for a misspelling
+            if !self.check(word) {
+                misspellings_count += 1;
+                output.write_all(word).expect("bad output");
+                output.write_all(b"\n").expect("bad output");
             }
         }
         Ok(Spellcheck {
