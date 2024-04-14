@@ -52,6 +52,7 @@ mod election {
 
         // in election terms: get the list of head-to-head matchups
         // between all pairs of candidates
+        // this is currently a little ungainly; could use a second pass
         fn get_edges(&self) -> Vec<Edge<usize, usize>> {
             let mut edges: Vec<Edge<usize, usize>> = Vec::new();
             for i in 0..self.candidates.len() {

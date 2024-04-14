@@ -15,7 +15,7 @@ where
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Vertex<T: PartialEq + Eq + Hash>(pub T);
 
-// i32 is the weight of this edge
+// G is the weight of this edge
 #[derive(Debug, PartialEq, Eq)]
 pub struct Edge<T: PartialEq + Eq + Hash, G>(pub Vertex<T>, pub Vertex<T>, pub G);
 
