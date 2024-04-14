@@ -31,7 +31,7 @@ impl Dictionary {
     fn load(&mut self, dictionary: &mut impl Read) -> Result<usize> {
         let reader = BufReader::new(dictionary);
         for line in reader.lines() {
-            let line = line.expect("dictionary file should be valid UTF-8");
+            let line = line?;
             self.words.insert(line);
         }
         Ok(self.words.len())
@@ -111,9 +111,9 @@ fn main() {
     }
 
     let mut dictionary = File::open(&args[1])
-        .expect(format!("should be able to open dictionary file: {}", args[1]).as_str());
+        .unwrap_or_else(|_| panic!("should be able to open dictionary file: {}", args[1]));
     let mut text = File::open(&args[2])
-        .expect(format!("should be able to open text file: {}", args[2]).as_str());
+        .unwrap_or_else(|_| panic!("should be able to open text file: {}", args[2]));
     let mut output = io::stdout();
 
     speller(&mut dictionary, &mut text, &mut output)
