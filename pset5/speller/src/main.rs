@@ -160,7 +160,7 @@ mod tests {
         assert_eq!(words, EXPECTED_NUMBER_OF_WORDS_IN_LARGE_DICT);
     }
 
-    const TEST_CASES: [(&str, usize, usize); 26] = [
+    const TEST_CASES: [(&str, usize, usize); 28] = [
         ("texts/cat.txt", 6, 0),
         (
             "texts/pneumonoultramicroscopicsilicovolcanoconiosis.txt",
@@ -187,12 +187,12 @@ mod tests {
         ("texts/homer.txt", 192975, 9339),
         ("texts/federalist.txt", 196784, 935),
         ("texts/surgery.txt", 198251, 3681),
-        // ("texts/xueqin2.txt", 265867, 12544),  not valid UTF-8
+        ("texts/xueqin2_repaired.txt", 265868, 12545),
         ("texts/tolstoy.txt", 567967, 13008),
         ("texts/aca.txt", 376904, 17062),
         ("texts/whittier.txt", 585394, 10111),
         ("texts/shakespeare.txt", 904612, 45691),
-        // ("texts/holmes.txt", 1150970, 17845),  not valid UTF-8
+        ("texts/holmes_repaired.txt", 1150913, 17802),
     ];
 
     #[test]
